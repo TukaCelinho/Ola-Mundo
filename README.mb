@@ -1,3 +1,159 @@
 # Olá Mundo
 
-Esse é meu primeiro commit
+#include <stdio.h>
+#include <stdlib.h>
+
+char tabuleiro[3][3]; // Tabuleiro global
+char jogadorAtual;    // 'X' ou 'O'
+
+// Função para inicializar tabuleiro vazio
+void inicializarTabuleiro() {
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            tabuleiro[i][j] = ' ';
+        }
+    }
+}
+
+// Função para exibir o tabuleiro
+void exibirTabuleiro() {
+    printf("\n=== Jogo da Velha ===\n\n");
+    printf("   1   2   3\n");
+    for (int i = 0; i < 3; i++) {
+        printf("%d  ", i + 1);
+        for (int j = 0; j < 3; j++) {
+            printf(" %c ", tabuleiro[i][j]);
+            if (j < 2) printf("|");
+        }
+        printf("\n");
+        if (i < 2) printf("  ---+---+---\n");
+    }
+    printf("\n");
+}
+
+// Função para alternar jogador
+void alternarJogador() {
+    if (jogadorAtual == 'X')
+        jogadorAtual = 'O';
+    else
+        jogadorAtual = 'X';
+}
+
+// Função para verificar vitória
+char verificarVencedor() {
+    // Linhas
+    for (int i = 0; i < 3; i++) {
+        if (tabuleiro[i][0] == jogadorAtual && tabuleiro[i][1] == jogadorAtual && tabuleiro[i][2] == jogadorAtual)
+            return jogadorAtual;
+    }
+    // Colunas
+    for (int j = 0; j < 3; j++) {
+        if (tabuleiro[0][j] == jogadorAtual && tabuleiro[1][j] == jogadorAtual && tabuleiro[2][j] == jogadorAtual)
+            return jogadorAtual;
+    }
+    // Diagonais
+    if (tabuleiro[0][0] == jogadorAtual && tabuleiro[1][1] == jogadorAtual && tabuleiro[2][2] == jogadorAtual)
+        return jogadorAtual;
+    if (tabuleiro[0][2] == jogadorAtual && tabuleiro[1][1] == jogadorAtual && tabuleiro[2][0] == jogadorAtual)
+        return jogadorAtual;
+
+    return ' '; // sem vencedor
+}
+
+// Função para verificar empate
+int verificarEmpate() {
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            if (tabuleiro[i][j] == ' ')
+                return 0; // ainda tem espaços vazios
+        }
+    }
+    return 1; // empate
+}
+
+// Função principal do jogo
+void jogar() {
+    int linha, coluna;
+    char vencedor = ' ';
+
+    inicializarTabuleiro();
+    jogadorAtual = 'X'; // começa com X
+
+    while (1) {
+        exibirTabuleiro();
+        printf("Jogador %c, digite linha (1-3) e coluna (1-3): ", jogadorAtual);
+        scanf("%d %d", &linha, &coluna);
+
+        // Validar entrada
+        if (linha < 1 || linha > 3 || coluna < 1 || coluna > 3) {
+            printf("Posicao invalida! Tente novamente.\n");
+            continue;
+        }
+        // Verificar se posição está livre
+        if (tabuleiro[linha - 1][coluna - 1] != ' ') {
+            printf("Posicao ja ocupada! Escolha outra.\n");
+            continue;
+        }
+
+        // Registrar jogada
+        tabuleiro[linha - 1][coluna - 1] = jogadorAtual;
+
+        // Verificar vencedor
+        vencedor = verificarVencedor();
+        if (vencedor != ' ') {
+            exibirTabuleiro();
+            printf("Jogador %c venceu! Parabens!\n", vencedor);
+            break;
+        }
+
+        // Verificar empate
+        if (verificarEmpate()) {
+            exibirTabuleiro();
+            printf("Empate!\n");
+            break;
+        }
+
+        // Alternar jogador
+        alternarJogador();
+    }
+}
+
+int main() {
+    int opcao;
+
+    printf("=====================================\n");
+    printf("  Bem-vindo ao Jogo da Velha em C!\n");
+    printf("=====================================\n\n");
+
+    while (1) {
+        printf("Menu Inicial:\n");
+        printf("1 - Iniciar Jogo\n");
+        printf("2 - Instrucoes\n");
+        printf("3 - Sair\n");
+        printf("\nEscolha uma opcao: ");
+        scanf("%d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                jogar();
+                break;
+
+            case 2:
+                printf("\nInstrucoes:\n");
+                printf("- O jogo da velha e disputado entre dois jogadores.\n");
+                printf("- Cada jogador escolhe um simbolo (X ou O).\n");
+                printf("- O objetivo e formar uma linha com tres simbolos iguais (horizontal, vertical ou diagonal).\n");
+                printf("- As jogadas sao feitas alternadamente.\n\n");
+                break;
+
+            case 3:
+                printf("\nSaindo do jogo... Ate a proxima!\n");
+                return 0;
+
+            default:
+                printf("\nOpcao invalida! Tente novamente.\n");
+                break;
+        }
+    }
+    return 0;
+}
